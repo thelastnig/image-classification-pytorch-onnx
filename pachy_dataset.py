@@ -36,7 +36,7 @@ class PachyClassificationDataset(Dataset):
       local_path = join_pachy_path(self.local_root, path)
       os.makedirs(os.path.dirname(local_path), exist_ok=True)
       pfs_file = self.client.get_file(self.commit, path)
-      with open(local_path, 'w') as local_file:
+      with open(local_path, 'wb') as local_file:
         shutil.copyfileobj(pfs_file, local_file)
 
   def __len__(self):
