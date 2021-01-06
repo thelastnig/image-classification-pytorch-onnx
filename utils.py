@@ -1,3 +1,5 @@
+import os
+
 import torch
 
 
@@ -27,3 +29,8 @@ def get_optimizer(parameters, hyper_dict):
 
   return opt_cls(parameters, lr=hyper_dict['learning_rate'],
                  weight_decay=hyper_dict['weight_decay'])
+
+
+def join_pachy_path(local_root, pachy_path):
+  pachy_path = pachy_path[1:] if pachy_path[0] == "/" else pachy_path
+  return os.path.join(local_root, pachy_path)

@@ -33,7 +33,7 @@ class PachyClassificationDataset(Dataset):
 
   def _download_data_from_pachyderm(self):
     for path in self.path_lst:
-      local_path = os.path.join(self.local_root, path)
+      local_path = join_pachy_path(self.local_root, path)
       os.makedirs(os.path.dirname(local_path), exist_ok=True)
       pfs_file = self.client.get_file(self.commit, path)
       with open(local_path, 'w') as local_file:
@@ -50,7 +50,7 @@ class PachyClassificationDataset(Dataset):
 
     path = self.path_lst[idx]
     return (
-      self.transform(Image.open(os.path.join(self.local_root, path))),
+      self.transform(Image.open(join_pachy_path(self.local_root, path))),
       index_to_one_hot(
         self.class_labels.index(
           get_class_label_from_path(path, self.path_prefix)),
