@@ -15,7 +15,7 @@ class PachyClassificationDataset(Dataset):
     self.commit = commit
     self.path_prefix = path_prefix
     self.client = python_pachyderm.Client(host=pachy_host, port=pachy_port)
-    self.path_lst = [res.file.path for res in self.client.glob_file(commit, path_prefix + "*")]
+    self.path_lst = [res.file.path for res in self.client.glob_file(commit, path_prefix + "*/*")]
     self.class_labels = list(set(get_class_label_from_path(path, path_prefix)
                                  for path in self.path_lst))
     self.num_classes = len(self.class_labels)
