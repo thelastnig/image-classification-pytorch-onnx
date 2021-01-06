@@ -40,7 +40,7 @@ class PachyClassificationDataset(Dataset):
         shutil.copyfileobj(pfs_file, local_file)
 
   def __len__(self):
-    return len(self.file_lst)
+    return len(self.path_lst)
 
   def __getitem__(self, idx):
     if isinstance(idx, torch.Tensor):
@@ -48,7 +48,7 @@ class PachyClassificationDataset(Dataset):
     if isinstance(idx, list):
       return [self[i] for i in idx]
 
-    path = self.file_lst[idx]
+    path = self.path_lst[idx]
     return (
       self.transform(Image.open(os.path.join(self.local_root, path))),
       index_to_one_hot(
