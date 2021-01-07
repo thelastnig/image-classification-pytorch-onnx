@@ -1,11 +1,9 @@
-import os
-import shutil
-
 import python_pachyderm
 import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision.transforms import ToTensor
+from tqdm import tqdm
 
 from .utils import *
 
@@ -32,12 +30,12 @@ class PachyClassificationDataset(Dataset):
     self._download_data_from_pachyderm()
 
   def _download_data_from_pachyderm(self):
-    for path in self.path_lst:
-      local_path = join_pachy_path(self.local_root, path)
+    print('Downloading data into worker')
+    for idx, chunk in enumerate(tqdm(self.client.get_file(self.commit, self.path_prefix + "*/*"))):
+      local_path = join_pachy_path(self.local_root, self.path_lst[idx])
       os.makedirs(os.path.dirname(local_path), exist_ok=True)
-      pfs_file = self.client.get_file(self.commit, path)
       with open(local_path, 'wb') as local_file:
-        shutil.copyfileobj(pfs_file, local_file)
+        local_file.write(chunk)
 
   def __len__(self):
     return len(self.path_lst)
