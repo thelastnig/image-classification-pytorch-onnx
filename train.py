@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import torch
 
@@ -8,6 +9,7 @@ from src.trainer import TrainerBase
 
 
 def main(args):
+  os.putenv("GIT_PYTHON_REFRESH", "quiet")
   device = 'cuda' if torch.cuda.is_available() else 'cpu'
   print(f"Running on {device}")
   train_dataset = PachyClassificationDataset('cifar10-raw/master', '/data/images/train/')

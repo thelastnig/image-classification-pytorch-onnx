@@ -3,6 +3,7 @@ import argparse
 from kfp import dsl
 from kfp.compiler import compiler
 import kfp.components
+from kubernetes.client.models import V1EnvVar
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Create a kubeflow pipeline')
@@ -15,10 +16,24 @@ if __name__ == "__main__":
   @dsl.pipeline(
     name=pipeline_name,
     description='test for pipeline')
-  def pipeline():
-    op = dsl.ContainerOp(name=pipeline_name,
-                         image=args.docker_image,
-                         )
+  def pipeline(aws_access_key_id,
+               aws_secret_access_key,
+               mlflow_s3_endpoint_url,
+               mlflow_tracking_uri,
+               aws_default_region):
+    op = dsl.ContainerOp(
+      name=pipeline_name, image=args.docker_image,
+    ).add_env_variable(
+      V1EnvVar(name="AWS_ACCESS_KEY_ID", value=aws_access_key_id)
+    ).add_env_variable(
+      V1EnvVar(name="AWS_SECRET_ACCESS_KEY", value=aws_secret_access_key)
+    ).add_env_variable(
+      V1EnvVar(name="MLFLOW_S3_ENDPOINT_URL", value=mlflow_s3_endpoint_url)
+    ).add_env_variable(
+      V1EnvVar(name="MLFLOW_TRACKING_URI", value=mlflow_tracking_uri)
+    ).add_env_variable(
+      V1EnvVar(name="AWS_DEFAULT_REGION", value=aws_default_region)
+    )
 
 
   pipeline_file_nm = f"{pipeline_name}.tar.gz"
