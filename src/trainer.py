@@ -75,7 +75,7 @@ class TrainerBase(object):
         start_time = time.time()
         self.model.zero_grad()
         pred, loss = self.model(x, gt)
-        acc = accuracy(pred, gt, 1)
+        acc = accuracy(pred, gt.argmax(dim=1), 1)
         self.avg_meter['test_loss'].update(loss.item())
         self.avg_meter['test_acc'].update(acc)
         end_time = time.time()
