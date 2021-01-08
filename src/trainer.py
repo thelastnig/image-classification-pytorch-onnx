@@ -12,8 +12,7 @@ from src.utils import get_optimizer, AverageMeter, accuracy
 class TrainerBase(object):
   def __init__(self,
                train_dataset, test_dataset, preprocessor,
-               model, tracker, uploader,
-               hyper_dict, experiment_name):
+               model, hyper_dict, experiment_name):
     self.train_dataset = train_dataset
     self.test_dataset = test_dataset
     self.preprocessor = preprocessor
@@ -21,8 +20,6 @@ class TrainerBase(object):
     self.model = model
     self.best_model = copy.deepcopy(model)
     self.best_test_loss = None
-    self.tracker = tracker
-    self.uploader = uploader
 
     self.epochs = hyper_dict['epochs']
     self.batch_size = hyper_dict['batch_size']

@@ -15,7 +15,7 @@ def main(args):
   model = ClassificationModel()
 
   trainer = TrainerBase(train_dataset, test_dataset, None,
-                        model, None, None, {
+                        model, {
                           'epochs': 5,
                           'batch_size': 8,
                           'num_workers': 0,
