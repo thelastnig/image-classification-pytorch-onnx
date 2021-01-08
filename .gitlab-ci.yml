@@ -6,6 +6,7 @@ before_script:
 
 stages:
   - build
+  - deploy
 
 build-master:
   stage: build
@@ -23,6 +24,20 @@ build:
     - docker build --pull -t "$CI_REGISTRY_IMAGE/pytorch_image_classification:$CI_COMMIT_REF_SLUG" .
     - docker push "$CI_REGISTRY_IMAGE/pytorch_image_classification:$CI_COMMIT_REF_SLUG"
   except:
+    - master
+  tags:
+    - shell
+
+kfp-deploy:
+  stage: deploy
+  before_script:
+    - apk add --update --no-cache python3 py3-pip
+    - pip3 install --no-cache --upgrade pip setuptools
+    - pip3 install kfp
+  script:
+    - docker pull "$CI_REGISTRY_IMAGE/pytorch_image_classification"
+    - python3 run_pipeline.py --docker-image "$CI_REGISTRY_IMAGE/pytorch_image_classification"
+  only:
     - master
   tags:
     - shell
