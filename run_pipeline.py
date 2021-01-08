@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
   pipeline_file_nm = f"{pipeline_name}.tar.gz"
   compiler.Compiler().compile(pipeline, pipeline_file_nm)
-  client = kfp.Client("http://175.197.4.150:31380/pipeline")
+  client = kfp.Client("http://175.197.5.142:31380/pipeline")
   try:
     client.upload_pipeline(pipeline_file_nm, f"{pipeline_name}_{timestamp}")
   except TypeError:
