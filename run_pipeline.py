@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime
 
 from kfp import dsl
 from kfp.compiler import compiler
@@ -11,6 +12,7 @@ if __name__ == "__main__":
   args = parser.parse_args()
 
   pipeline_name = 'trainer_classification'
+  timestamp = datetime.now().strftime("%Y-%m-%d_%H:%:%S")
 
 
   @dsl.pipeline(
@@ -40,7 +42,7 @@ if __name__ == "__main__":
   compiler.Compiler().compile(pipeline, pipeline_file_nm)
   client = kfp.Client("http://175.197.4.150:31380/pipeline")
   try:
-    client.upload_pipeline(pipeline_file_nm, pipeline_name)
+    client.upload_pipeline(pipeline_file_nm, f"{pipeline_name}_{timestamp}")
   except TypeError:
     pass  # https://github.com/kubeflow/pipelines/issues/2764
     # This can be removed once KF proper uses the latest KFP
