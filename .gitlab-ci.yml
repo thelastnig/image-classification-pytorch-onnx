@@ -31,8 +31,9 @@ build:
 kfp-deploy:
   stage: deploy
   before_script:
-    - pip3 install --no-cache --upgrade pip setuptools
-    - pip3 install kfp
+    - python3 -m ensurepip
+    - python3 -m pip install --no-cache --upgrade pip setuptools
+    - python3 -m pip install kfp
   script:
     - docker pull "$CI_REGISTRY_IMAGE/pytorch_image_classification"
     - python3 run_pipeline.py --docker-image "$CI_REGISTRY_IMAGE/pytorch_image_classification"
