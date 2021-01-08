@@ -103,7 +103,7 @@ class TrainerBase(object):
     mlflow.set_tracking_uri(os.environ['MLFLOW_TRACKING_URI'])
 
     filename = self.save_checkpoint(0)
-    model_size = round(os.path.getsize(filename) / 10e6)
+    model_size = round(os.path.getsize(filename) / 1e6)
     mlflow.set_tag("model_size", model_size)
 
     for hyper_key, hyper_value in self.hyper_dict.items():
