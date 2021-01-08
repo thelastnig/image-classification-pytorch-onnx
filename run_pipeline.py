@@ -12,7 +12,7 @@ if __name__ == "__main__":
   args = parser.parse_args()
 
   pipeline_name = 'trainer_classification'
-  timestamp = datetime.now().strftime("%Y%m%d_%H%%S")
+  timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
   @dsl.pipeline(
