@@ -124,7 +124,8 @@ class TrainerBase(object):
         key = f"{split}_{metric}"
         mlflow.log_metric(key=key, value=self.avg_meter[key].avg, step=epoch)
 
-    if self.best_test_loss is None or self.best_test_loss > self.avg_meter['test_loss']:
+    if self.best_test_loss is None or self.best_test_loss > self.avg_meter['test_loss'].avg:
+      self.best_test_loss = self.avg_meter['test_loss'].avg
       self.best_model = copy.deepcopy(self.model)
 
   def after_train(self):
