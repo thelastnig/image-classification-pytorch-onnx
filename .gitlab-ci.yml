@@ -30,6 +30,8 @@ build:
 
 kfp-deploy:
   image: python:latest
+  variables:
+    GIT_SSL_NO_VERIFY: 1
   stage: deploy
   before_script:
     - python3 -m ensurepip
