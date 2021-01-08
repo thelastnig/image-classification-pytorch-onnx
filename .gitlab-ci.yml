@@ -29,16 +29,15 @@ build:
     - shell
 
 kfp-deploy:
+  image: python:latest
   stage: deploy
   before_script:
-    - apt-get update && apt-get install -y python3
     - python3 -m ensurepip
     - python3 -m pip install --no-cache --upgrade pip setuptools
     - python3 -m pip install kfp
   script:
-    - docker pull "$CI_REGISTRY_IMAGE/pytorch_image_classification"
     - python3 run_pipeline.py --docker-image "$CI_REGISTRY_IMAGE/pytorch_image_classification"
   only:
     - master
   tags:
-    - shell
+    - docker
