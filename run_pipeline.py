@@ -33,7 +33,7 @@ if __name__ == "__main__":
       V1EnvVar(name="MLFLOW_TRACKING_URI", value=mlflow_tracking_uri)
     ).add_env_variable(
       V1EnvVar(name="AWS_DEFAULT_REGION", value=aws_default_region)
-    )
+    ).set_gpu_limit(1)
 
 
   pipeline_file_nm = f"{pipeline_name}.tar.gz"
