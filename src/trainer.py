@@ -66,7 +66,7 @@ class TrainerBase(object):
       loss.backward()
       self.optimizer.step()
       end_time = time.time()
-      self.avg_meter['time'].update(end_time - start_time)
+      self.avg_meter['train_time'].update(end_time - start_time)
       self.current_iter += 1
 
   def test(self):
