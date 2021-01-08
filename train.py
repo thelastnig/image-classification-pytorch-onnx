@@ -16,12 +16,12 @@ def main(args):
 
   trainer = TrainerBase(train_dataset, test_dataset, None,
                         model, {
-                          'epochs': 20,
-                          'batch_size': 32,
+                          'epochs': args.epoch,
+                          'batch_size': args.batch_size,
                           'num_workers': 2,
                           'optimizer': 'adam',
-                          'learning_rate': 1e-3,
-                          'weight_decay': 2e-5,
+                          'learning_rate': args.lr,
+                          'weight_decay': args.weight_decay,
                         }, args.experiment_name)
   trainer.train()
 
@@ -30,8 +30,8 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   # Learning parameters
   parser.add_argument('--dataset_name', default="jybtest", type=str, help="dataset_name")
-  parser.add_argument('--batch_size', default=512, type=int, help="batch_size")
-  parser.add_argument('--epoch', default=90, type=int, help="epoch")
+  parser.add_argument('--batch_size', default=32, type=int, help="batch_size")
+  parser.add_argument('--epoch', default=20, type=int, help="epoch")
   parser.add_argument('--lr', default=1e-3, type=float, help="lr")
   parser.add_argument('--momentum', default=0.9, type=float, help="momentum")
   parser.add_argument('--weight_decay', default=5e-4, type=float, help="weight_decay")
