@@ -60,7 +60,7 @@ class TrainerBase(object):
       start_time = time.time()
       self.model.zero_grad()
       pred, loss = self.model(x, gt)
-      acc = accuracy(pred, gt, 1)
+      acc = accuracy(pred, gt.argmax(dim=1), 1)
       self.avg_meter['train_loss'].update(loss.item(), x.shape[0])
       self.avg_meter['train_acc'].update(acc, x.shape[0])
       loss.backward()
