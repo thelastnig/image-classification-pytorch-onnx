@@ -2,7 +2,7 @@ import argparse
 
 import torch
 
-from src.model import ClassificationModel
+from src.resnet import *
 from src.pachy_dataset import PachyClassificationDataset
 from src.trainer import TrainerBase
 
@@ -12,13 +12,13 @@ def main(args):
   print(f"Running on {device}")
   train_dataset = PachyClassificationDataset('cifar10-raw/master', '/data/images/train/')
   test_dataset = PachyClassificationDataset('cifar10-raw/master', '/data/images/test/')
-  model = ClassificationModel()
+  model = resnet18(num_classes=train_dataset.num_classes)
 
   trainer = TrainerBase(train_dataset, test_dataset, None,
                         model, {
-                          'epochs': 5,
-                          'batch_size': 8,
-                          'num_workers': 0,
+                          'epochs': 20,
+                          'batch_size': 32,
+                          'num_workers': 2,
                           'optimizer': 'adam',
                           'learning_rate': 1e-3,
                           'weight_decay': 2e-5,
