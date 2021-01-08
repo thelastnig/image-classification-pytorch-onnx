@@ -12,7 +12,8 @@ from src.utils import get_optimizer, AverageMeter, accuracy
 class TrainerBase(object):
   def __init__(self,
                train_dataset, test_dataset, preprocessor,
-               model, hyper_dict, experiment_name):
+               model, hyper_dict, experiment_name,
+               device):
     self.train_dataset = train_dataset
     self.test_dataset = test_dataset
     self.preprocessor = preprocessor
@@ -27,6 +28,7 @@ class TrainerBase(object):
     self.hyper_dict = hyper_dict
 
     self.experiment_name = experiment_name
+    self.device = device
 
     self.avg_meter = {
       'train_loss': AverageMeter(),
@@ -59,7 +61,8 @@ class TrainerBase(object):
     for x, gt in self.train_ldr:
       start_time = time.time()
       self.model.zero_grad()
-      pred, loss = self.model(x, gt)
+      gt = gt.to(self.device)
+      pred, loss = self.model(x.to(self.device), gt)
       acc = accuracy(pred, gt.argmax(dim=1), 1)
       self.avg_meter['train_loss'].update(loss.item(), x.shape[0])
       self.avg_meter['train_acc'].update(acc, x.shape[0])
@@ -74,7 +77,8 @@ class TrainerBase(object):
       for x, gt in self.test_ldr:
         start_time = time.time()
         self.model.zero_grad()
-        pred, loss = self.model(x, gt)
+        gt = gt.to(self.device)
+        pred, loss = self.model(x.to(self.device), gt)
         acc = accuracy(pred, gt.argmax(dim=1), 1)
         self.avg_meter['test_loss'].update(loss.item())
         self.avg_meter['test_acc'].update(acc)
@@ -82,7 +86,7 @@ class TrainerBase(object):
         self.avg_meter['test_time'].update(end_time - start_time)
 
   def predict(self, x):
-    x = self.preprocessor(x)
+    x = self.preprocessor(x).to(self.device)
     with torch.no_grad():
       pred, _ = self.model(x)
     return pred
@@ -104,6 +108,8 @@ class TrainerBase(object):
 
     for hyper_key, hyper_value in self.hyper_dict.items():
       mlflow.log_param(hyper_key, hyper_value)
+
+    self.model = self.model.to(self.device)
 
   def before_epoch(self, epoch):
     pass

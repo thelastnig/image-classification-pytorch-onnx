@@ -24,7 +24,8 @@ def main(args):
                           'optimizer': 'adam',
                           'learning_rate': args.lr,
                           'weight_decay': args.weight_decay,
-                        }, args.experiment_name)
+                        }, args.experiment_name,
+                        device)
   trainer.train()
 
 
