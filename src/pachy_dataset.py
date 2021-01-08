@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 from torchvision.transforms import ToTensor
 from tqdm import tqdm
 
-from .utils import *
+from src.utils import *
 
 
 class PachyClassificationDataset(Dataset):

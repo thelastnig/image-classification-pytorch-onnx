@@ -6,7 +6,7 @@ import mlflow
 import torch
 from torch.utils.data import DataLoader
 
-from .utils import get_optimizer, AverageMeter, accuracy
+from src.utils import get_optimizer, AverageMeter, accuracy
 
 
 class TrainerBase(object):

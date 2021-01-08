@@ -2,9 +2,9 @@ import argparse
 
 import torch
 
-from model import ClassificationModel
-from pachy_dataset import PachyClassificationDataset
-from trainer import TrainerBase
+from src.model import ClassificationModel
+from src.pachy_dataset import PachyClassificationDataset
+from src.trainer import TrainerBase
 
 
 def main(args):
