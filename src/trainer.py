@@ -130,7 +130,7 @@ class TrainerBase(object):
     self.before_train()
     self.current_iter = 0
 
-    for epoch in self.epochs:
+    for epoch in range(self.epochs):
       self.before_epoch(epoch)
       self.train_epoch()
       self.test()
