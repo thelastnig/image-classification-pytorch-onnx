@@ -150,12 +150,14 @@ class EfficientNet(nn.Module):
         >>> outputs = model(inputs)
     """
 
-    def __init__(self, blocks_args=None, global_params=None):
+    def __init__(self, blocks_args=None, global_params=None, criterion=nn.BCEWithLogitsLoss()):
         super().__init__()
         assert isinstance(blocks_args, list), 'blocks_args should be a list'
         assert len(blocks_args) > 0, 'block args must be greater than 0'
         self._global_params = global_params
         self._blocks_args = blocks_args
+
+        self.criterion = criterion
 
         # Batch norm parameters
         bn_mom = 1 - self._global_params.batch_norm_momentum
@@ -279,7 +281,7 @@ class EfficientNet(nn.Module):
 
         return x
 
-    def forward(self, inputs):
+    def forward(self, inputs, y=None):
         """EfficientNet's forward function.
            Calls extract_features to extract features, applies final linear layer, and returns logits.
         Args:
@@ -295,7 +297,14 @@ class EfficientNet(nn.Module):
             x = x.flatten(start_dim=1)
             x = self._dropout(x)
             x = self._fc(x)
-        return x
+        
+        if y is not None:
+          pred = x
+          loss = self.criterion(pred, y)
+          return pred, loss
+        else:
+          pred = x
+          return pred
 
     @classmethod
     def from_name(cls, model_name, in_channels=3, **override_params):

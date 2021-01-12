@@ -28,9 +28,11 @@ class VGG(nn.Module):
         self,
         features: nn.Module,
         num_classes: int = 1000,
-        init_weights: bool = True
+        init_weights: bool = True,
+        criterion=nn.BCEWithLogitsLoss()
     ) -> None:
         super(VGG, self).__init__()
+        self.criterion = criterion
         self.features = features
         self.avgpool = nn.AdaptiveAvgPool2d((7, 7))
         self.classifier = nn.Sequential(
@@ -45,12 +47,18 @@ class VGG(nn.Module):
         if init_weights:
             self._initialize_weights()
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, y=None) -> torch.Tensor:
         x = self.features(x)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
         x = self.classifier(x)
-        return x
+        if y is not None:
+          pred = x
+          loss = self.criterion(pred, y)
+          return pred, loss
+        else:
+          pred = x
+          return pred
 
     def _initialize_weights(self) -> None:
         for m in self.modules():

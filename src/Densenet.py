@@ -162,10 +162,13 @@ class DenseNet(nn.Module):
         bn_size: int = 4,
         drop_rate: float = 0,
         num_classes: int = 1000,
-        memory_efficient: bool = False
+        memory_efficient: bool = False,
+        criterion=nn.BCEWithLogitsLoss()
     ) -> None:
 
         super(DenseNet, self).__init__()
+
+        self.criterion = criterion
 
         # First convolution
         self.features = nn.Sequential(OrderedDict([
@@ -211,13 +214,19 @@ class DenseNet(nn.Module):
             elif isinstance(m, nn.Linear):
                 nn.init.constant_(m.bias, 0)
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: Tensor, y=None) -> Tensor:
         features = self.features(x)
         out = F.relu(features, inplace=True)
         out = F.adaptive_avg_pool2d(out, (1, 1))
         out = torch.flatten(out, 1)
         out = self.classifier(out)
-        return out
+        if y is not None:
+          pred = out
+          loss = self.criterion(pred, y)
+          return pred, loss
+        else:
+          pred = out
+          return pred
 
 
 def _load_state_dict(model: nn.Module, model_url: str, progress: bool) -> None:
