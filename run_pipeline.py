@@ -20,9 +20,9 @@ if __name__ == "__main__":
     description='test for pipeline')
   def pipeline(aws_access_key_id,
                aws_secret_access_key,
-               mlflow_s3_endpoint_url,
-               mlflow_tracking_uri,
-               aws_default_region):
+               mlflow_s3_endpoint_url="http://175.197.4.122:9000",
+               mlflow_tracking_uri="http://175.197.4.214:5000",
+               aws_default_region="SEOUL"):
     op = dsl.ContainerOp(
       name=pipeline_name, image=args.docker_image,
     ).add_env_variable(
