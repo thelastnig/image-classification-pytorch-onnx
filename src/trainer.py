@@ -32,7 +32,7 @@ class ImageClassificationTrainer(object):
 
     key_lst = []
     for split in ('train', 'val', 'test'):
-      for metric in ('loss', 'acc'):
+      for metric in ('loss', 'acc', 'time'):
         key_lst.append(f"{split}_{metric}")
 
     self.avg_meter = {key: AverageMeter() for key in key_lst}
