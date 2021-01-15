@@ -13,7 +13,7 @@ class ImageClassificationTrainer(object):
   def __init__(self,
                train_dataset, val_dataset, test_dataset,
                model, hyper_dict, experiment_name,
-               device):
+               device, cross_validation=False):
     self.train_dataset = train_dataset
     self.val_dataset = val_dataset
     self.test_dataset = test_dataset
@@ -29,6 +29,7 @@ class ImageClassificationTrainer(object):
 
     self.experiment_name = experiment_name
     self.device = device
+    self.cross_validation = cross_validation
 
     key_lst = []
     for split in ('train', 'val', 'test'):
@@ -114,10 +115,12 @@ class ImageClassificationTrainer(object):
     if self.best_val_loss is None or self.best_val_loss > self.avg_meter['val_loss'].avg:
       self.best_val_loss = self.avg_meter['val_loss'].avg
       self.best_model = copy.deepcopy(self.model)
+      self.test_loss_at_best_val = self.avg_meter['test_loss'].avg
 
   def after_train(self):
-    mlflow.log_artifacts('runs', artifact_path="tensorboard")
-    mlflow.pytorch.log_model(self.best_model, artifact_path="pytorch-model")
+    if not self.cross_validation:
+      mlflow.log_artifacts('runs', artifact_path="tensorboard")
+      mlflow.pytorch.log_model(self.best_model, artifact_path="pytorch-model")
     print('Finished Training')
 
   def train(self):

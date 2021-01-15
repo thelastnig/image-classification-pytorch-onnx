@@ -1,6 +1,8 @@
 import argparse
+import copy
 import os
 
+import mlflow
 import torch
 
 from src.models import *
@@ -52,12 +54,20 @@ def main(args):
     trainval_dataset = SplitDataset(dataset, (0., val_test_barrier), args.split_seed)
     test_dataset = SplitDataset(dataset, (val_test_barrier, 1.), args.split_seed)
     cv = CrossValidation(trainval_dataset, args.num_cv_folds, args.split_seed)
+    best_model = None
+    test_loss_at_best_val = -1
     for fold_idx, (train_dataset, val_dataset) in enumerate(cv):
       print(f"Train: {len(train_dataset)}, Val: {len(val_dataset)}, Test: {len(test_dataset)}")
       trainer = ImageClassificationTrainer(
         train_dataset, val_dataset, test_dataset, model, hyper_dict,
-        f"{args.experiment_name}_{fold_idx + 1}/{args.num_cv_folds}", device)
+        f"{args.experiment_name}_{fold_idx + 1}/{args.num_cv_folds}", device, True)
       trainer.train()
+
+      if best_model is None or test_loss_at_best_val > trainer.test_loss_at_best_val:
+        test_loss_at_best_val = trainer.test_loss_at_best_val
+        best_model = copy.deepcopy(trainer.best_model)
+    mlflow.log_artifacts('runs', artifact_path="tensorboard")
+    mlflow.pytorch.log_model(best_model, artifact_path="pytorch-model")
   else:
     raise ValueError(f"Unknown split_type {args.split_type}")
 
