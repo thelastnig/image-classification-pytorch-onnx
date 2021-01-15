@@ -12,9 +12,15 @@ def main(args):
   os.environ["GIT_PYTHON_REFRESH"] = "quiet"
   device = 'cuda' if torch.cuda.is_available() else 'cpu'
   print(f"Running on {device}")
+
+  if args.model_name in globals():
+    model_cls = eval(args.model_name)
+  else:
+    raise ValueError(f"{args.model_name} is not a registered model name")
+
   train_dataset = PachyClassificationDataset('cifar10-raw/master', '/data/images/train/')
   test_dataset = PachyClassificationDataset('cifar10-raw/master', '/data/images/test/')
-  model = resnet18(num_classes=train_dataset.num_classes)
+  model = model_cls(num_classes=train_dataset.num_classes)
 
   trainer = TrainerBase(train_dataset, test_dataset, None,
                         model, {
@@ -36,6 +42,7 @@ if __name__ == "__main__":
   parser.add_argument('--batch_size', default=32, type=int, help="batch_size")
   parser.add_argument('--epoch', default=20, type=int, help="epoch")
   parser.add_argument('--lr', default=1e-3, type=float, help="lr")
+  parser.add_argument('--model_name', default="resnet18", type=str, help="model_name")
   parser.add_argument('--momentum', default=0.9, type=float, help="momentum")
   parser.add_argument('--weight_decay', default=5e-4, type=float, help="weight_decay")
   parser.add_argument('--experiment_name', default="any_exp", type=str, help="exp_name")
