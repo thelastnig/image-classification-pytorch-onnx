@@ -98,7 +98,8 @@ class ImageClassificationTrainer(object):
     self.model = self.model.to(self.device)
 
   def before_epoch(self, epoch):
-    pass
+    for avg_meter in self.avg_meter.values():
+      avg_meter.reset()
 
   def after_epoch(self, epoch):
     for key in self.avg_meter:
