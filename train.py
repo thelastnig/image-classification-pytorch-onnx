@@ -30,13 +30,14 @@ def main(args):
     'weight_decay': args.weight_decay,
   }
 
-  split_total = args.split_training + args.split_validation + args.split_test
-  train_val_barrier = args.split_training / split_total
-  val_test_barrier = (args.split_training + args.split_validation) / split_total
-  test_dataset = SplitDataset(dataset, (val_test_barrier, 1.), args.split_seed)
   if args.split_type == "T":
+    split_total = args.split_training + args.split_validation + args.split_test
+    train_val_barrier = args.split_training / split_total
+    val_test_barrier = (args.split_training + args.split_validation) / split_total
+
     train_dataset = SplitDataset(dataset, (0., train_val_barrier), args.split_seed)
     val_dataset = SplitDataset(dataset, (train_val_barrier, val_test_barrier), args.split_seed)
+    test_dataset = SplitDataset(dataset, (val_test_barrier, 1.), args.split_seed)
     print(f"Train: {len(train_dataset)}, Val: {len(val_dataset)}, Test: {len(test_dataset)}")
 
     trainer = ImageClassificationTrainer(
@@ -45,7 +46,11 @@ def main(args):
     trainer.train()
   elif args.split_type == "C":
     print(f"Running {args.num_cv_folds}-fold cross validation")
+    split_total = args.num_cv_folds + 1
+    val_test_barrier = args.num_cv_folds / split_total
+
     trainval_dataset = SplitDataset(dataset, (0., val_test_barrier), args.split_seed)
+    test_dataset = SplitDataset(dataset, (val_test_barrier, 1.), args.split_seed)
     cv = CrossValidation(trainval_dataset, args.num_cv_folds, args.split_seed)
     for fold_idx, (train_dataset, val_dataset) in enumerate(cv):
       print(f"Train: {len(train_dataset)}, Val: {len(val_dataset)}, Test: {len(test_dataset)}")
