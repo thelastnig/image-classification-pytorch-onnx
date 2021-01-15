@@ -22,7 +22,6 @@ def main(args):
     raise ValueError(f"{args.model_name} is not a registered model name")
 
   dataset = PachyClassificationDataset(f'{args.dataset_name}/master', '/data/images/test/')
-  model = model_cls(num_classes=dataset.num_classes)
   hyper_dict = {
     'epochs': args.epoch,
     'batch_size': args.batch_size,
@@ -42,6 +41,7 @@ def main(args):
     test_dataset = SplitDataset(dataset, (val_test_barrier, 1.), args.split_seed)
     print(f"Train: {len(train_dataset)}, Val: {len(val_dataset)}, Test: {len(test_dataset)}")
 
+    model = model_cls(num_classes=dataset.num_classes)
     trainer = ImageClassificationTrainer(
       train_dataset, val_dataset, test_dataset, model,
       hyper_dict, args.experiment_name, device)
@@ -58,6 +58,7 @@ def main(args):
     test_loss_at_best_val = -1
     for fold_idx, (train_dataset, val_dataset) in enumerate(cv):
       print(f"Train: {len(train_dataset)}, Val: {len(val_dataset)}, Test: {len(test_dataset)}")
+      model = model_cls(num_classes=dataset.num_classes)
       trainer = ImageClassificationTrainer(
         train_dataset, val_dataset, test_dataset, model, hyper_dict,
         f"{args.experiment_name}_{fold_idx + 1}/{args.num_cv_folds}", device, True)
