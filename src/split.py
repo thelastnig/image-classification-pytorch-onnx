@@ -78,13 +78,12 @@ class CrossValidation(object):
     :param seed: Random seed for shuffling the indices
     """
     self.full_dataset = dataset
-    cnt = len(dataset)
     self.num_folds = num_folds
     self.iter = 0
 
     self.folds = []
     for idx in range(num_folds):
-      self.folds.append(SplitDataset(dataset, (idx / cnt, (idx + 1) / cnt), seed))
+      self.folds.append(SplitDataset(dataset, (idx / num_folds, (idx + 1) / num_folds), seed))
 
   def __len__(self):
     return self.num_folds
