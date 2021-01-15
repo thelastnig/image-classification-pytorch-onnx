@@ -5,7 +5,7 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
-from .utils_effinet import (
+from src.models.utils import (
     round_filters,
     round_repeats,
     drop_connect,
