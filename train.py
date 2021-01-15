@@ -19,7 +19,7 @@ def main(args):
   else:
     raise ValueError(f"{args.model_name} is not a registered model name")
 
-  dataset = PachyClassificationDataset(f'{args.dataset_name}/master', '/data/images/train/')
+  dataset = PachyClassificationDataset(f'{args.dataset_name}/master', '/data/images/test/')
   model = model_cls(num_classes=dataset.num_classes)
   hyper_dict = {
     'epochs': args.epoch,
