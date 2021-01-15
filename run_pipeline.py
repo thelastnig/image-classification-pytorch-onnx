@@ -22,9 +22,12 @@ if __name__ == "__main__":
                aws_secret_access_key,
                mlflow_s3_endpoint_url="http://175.197.4.122:9000",
                mlflow_tracking_uri="http://175.197.4.214:5000",
-               aws_default_region="SEOUL"):
+               aws_default_region="SEOUL",
+               model_name="resnet18",
+               split_type="T"):
     op = dsl.ContainerOp(
       name=pipeline_name, image=args.docker_image,
+      arguments=f"--model_name {model_name} --split_type {split_type}"
     ).add_env_variable(
       V1EnvVar(name="AWS_ACCESS_KEY_ID", value=aws_access_key_id)
     ).add_env_variable(
