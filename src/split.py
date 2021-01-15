@@ -93,7 +93,7 @@ class CrossValidation(object):
     self.iter = 0
     return self
 
-  def next(self):
+  def __next__(self):
     if self.iter == self.num_folds:
       return StopIteration()
     val_idx = (self.iter - 1) % self.num_folds
