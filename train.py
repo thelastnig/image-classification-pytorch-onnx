@@ -3,7 +3,7 @@ import os
 
 import torch
 
-from src.models.resnet import *
+from src.models import *
 from src.pachy_dataset import PachyClassificationDataset
 from src.trainer import TrainerBase
 

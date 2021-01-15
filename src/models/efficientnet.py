@@ -18,6 +18,7 @@ from src.models.utils import (
     calculate_output_image_size
 )
 
+__all__ = ['EfficientNet']
 
 VALID_MODELS = (
     'efficientnet-b0', 'efficientnet-b1', 'efficientnet-b2', 'efficientnet-b3',
