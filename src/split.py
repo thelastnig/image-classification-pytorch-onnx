@@ -96,7 +96,7 @@ class CrossValidation(object):
     if self.iter == self.num_folds:
       return StopIteration()
     val_idx = (self.iter - 1) % self.num_folds
-    train_dataset = MergedDataset(self.folds[self.iter:val_idx] + self.folds[val_idx + 1:])
+    train_dataset = MergedDataset(self.folds[:val_idx] + self.folds[val_idx + 1:])
     val_dataset = self.folds[val_idx]
     self.iter += 1
     return train_dataset, val_dataset
