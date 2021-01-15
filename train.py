@@ -60,7 +60,7 @@ if __name__ == "__main__":
   # Learning parameters
   parser.add_argument('--dataset_name', default="cifar10-raw", type=str, help="dataset_name")
   parser.add_argument('--batch_size', default=32, type=int, help="batch_size")
-  parser.add_argument('--epoch', default=20, type=int, help="epoch")
+  parser.add_argument('--epoch', default=2, type=int, help="epoch")
   parser.add_argument('--lr', default=1e-3, type=float, help="lr")
   parser.add_argument('--model_name', default="resnet18", type=str, help="model_name")
   parser.add_argument('--momentum', default=0.9, type=float, help="momentum")
