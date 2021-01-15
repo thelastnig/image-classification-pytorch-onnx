@@ -18,7 +18,9 @@ from src.models.utils import (
     calculate_output_image_size
 )
 
-__all__ = ['EfficientNet']
+__all__ = ['efficientnet_b0', 'efficientnet_b1', 'efficientnet_b2', 'efficientnet_b3',
+           'efficientnet_b4', 'efficientnet_b5', 'efficientnet_b6', 'efficientnet_b7',
+           'efficientnet_b8', 'efficientnet_l2']
 
 VALID_MODELS = (
     'efficientnet-b0', 'efficientnet-b1', 'efficientnet-b2', 'efficientnet-b3',
@@ -394,3 +396,43 @@ class EfficientNet(nn.Module):
             Conv2d = get_same_padding_conv2d(image_size=self._global_params.image_size)
             out_channels = round_filters(32, self._global_params)
             self._conv_stem = Conv2d(in_channels, out_channels, kernel_size=3, stride=2, bias=False)
+
+
+def efficientnet_b0(**kwargs):
+    return EfficientNet.from_name("efficientnet-b0", **kwargs)
+
+
+def efficientnet_b1(**kwargs):
+    return EfficientNet.from_name("efficientnet-b1", **kwargs)
+
+
+def efficientnet_b2(**kwargs):
+    return EfficientNet.from_name("efficientnet-b2", **kwargs)
+
+
+def efficientnet_b3(**kwargs):
+    return EfficientNet.from_name("efficientnet-b3", **kwargs)
+
+
+def efficientnet_b4(**kwargs):
+    return EfficientNet.from_name("efficientnet-b4", **kwargs)
+
+
+def efficientnet_b5(**kwargs):
+    return EfficientNet.from_name("efficientnet-b5", **kwargs)
+
+
+def efficientnet_b6(**kwargs):
+    return EfficientNet.from_name("efficientnet-b6", **kwargs)
+
+
+def efficientnet_b7(**kwargs):
+    return EfficientNet.from_name("efficientnet-b7", **kwargs)
+
+
+def efficientnet_b8(**kwargs):
+    return EfficientNet.from_name("efficientnet-b8", **kwargs)
+
+
+def efficientnet_l2(**kwargs):
+    return EfficientNet.from_name("efficientnet-l2", **kwargs)
