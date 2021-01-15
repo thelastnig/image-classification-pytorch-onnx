@@ -30,7 +30,7 @@ class SplitDataset(torch.utils.data.Dataset):
 
     idx = np.arange(0, cnt)
     np.random.shuffle(idx)
-    self.idx_in_full_dataset += idx[lower_bound:upper_bound].tolist()
+    self.idx_in_full_dataset = idx[lower_bound:upper_bound].tolist()
 
   def __len__(self):
     return len(self.idx_in_full_dataset)
