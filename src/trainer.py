@@ -87,6 +87,8 @@ class ImageClassificationTrainer(object):
     return filename
 
   def before_train(self):
+    print(f"Train: {len(self.train_dataset)}, Val: {len(self.val_dataset)}, Test: {len(self.test_dataset)}")
+
     mlflow.set_tracking_uri(os.environ['MLFLOW_TRACKING_URI'])
 
     filename = self.save_checkpoint(0)
@@ -155,7 +157,7 @@ class ImageClassificationCVWrapper(object):
     self.test_loss_at_best_val = -1
 
   def before_train(self):
-    pass
+    print(f"Running {self.num_folds}-fold cross validation")
 
   def before_fold(self):
     model = self.build_model()

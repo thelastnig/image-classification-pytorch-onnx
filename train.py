@@ -39,7 +39,6 @@ def main(args):
     train_dataset = SplitDataset(dataset, (0., train_val_barrier), args.split_seed)
     val_dataset = SplitDataset(dataset, (train_val_barrier, val_test_barrier), args.split_seed)
     test_dataset = SplitDataset(dataset, (val_test_barrier, 1.), args.split_seed)
-    print(f"Train: {len(train_dataset)}, Val: {len(val_dataset)}, Test: {len(test_dataset)}")
 
     model = model_cls(num_classes=dataset.num_classes)
     trainer = ImageClassificationTrainer(
@@ -47,7 +46,6 @@ def main(args):
       hyper_dict, args.experiment_name, device)
     trainer.train()
   elif args.split_type == "C":
-    print(f"Running {args.num_cv_folds}-fold cross validation")
     split_total = args.num_cv_folds + 1
     val_test_barrier = args.num_cv_folds / split_total
 
