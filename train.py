@@ -66,7 +66,7 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   # Learning parameters
   parser.add_argument('--dataset_name', default="voctrainval", type=str, help="dataset_name")
-  parser.add_argument('--batch_size', default=32, type=int, help="batch_size")
+  parser.add_argument('--batch_size', default=8, type=int, help="batch_size")
   parser.add_argument('--epoch', default=10, type=int, help="epoch")
   parser.add_argument('--lr', default=1e-3, type=float, help="lr")
   parser.add_argument('--model_name', default="DeepV3PlusW38", type=str, help="model_name")
