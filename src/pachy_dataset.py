@@ -29,8 +29,8 @@ class PachySemanticDataset(Dataset):
   def __init__(self, commit, path_prefix="/",
                pachy_host="175.197.4.150", pachy_port="30650",
                local_root='/data',
-               transform=T.Compose([T.Resize(512, 512), T.ToTensor()]),
-               target_transform=T.Compose([T.Resize(512, 512), ToLongTensor()])):
+               transform=T.Compose([T.Resize((512, 512)), T.ToTensor()]),
+               target_transform=T.Compose([T.Resize((512, 512)), ToLongTensor()])):
     self.commit = commit
     self.path_prefix = path_prefix
     self.client = python_pachyderm.Client(host=pachy_host, port=pachy_port)
