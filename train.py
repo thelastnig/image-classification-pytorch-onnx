@@ -31,6 +31,7 @@ def main(args):
     'learning_rate': args.lr,
     'weight_decay': args.weight_decay,
   }
+  config.update_dataset_cfg(dataset.num_classes, 255)
   config.assert_and_infer_cfg(train_mode=True)
 
   if args.split_type == "T":
