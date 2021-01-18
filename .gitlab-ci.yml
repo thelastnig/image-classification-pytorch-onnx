@@ -11,8 +11,8 @@ stages:
 build-master:
   stage: build
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE/pytorch_image_classification" .
-    - docker push "$CI_REGISTRY_IMAGE/pytorch_image_classification"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/pytorch_semantic_segmentation" .
+    - docker push "$CI_REGISTRY_IMAGE/pytorch_semantic_segmentation"
   only:
     - master
   tags:
@@ -21,8 +21,8 @@ build-master:
 build:
   stage: build
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE/pytorch_image_classification:$CI_COMMIT_REF_SLUG" .
-    - docker push "$CI_REGISTRY_IMAGE/pytorch_image_classification:$CI_COMMIT_REF_SLUG"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/pytorch_semantic_segmentation:$CI_COMMIT_REF_SLUG" .
+    - docker push "$CI_REGISTRY_IMAGE/pytorch_semantic_segmentation:$CI_COMMIT_REF_SLUG"
   except:
     - master
   tags:
@@ -38,7 +38,7 @@ kfp-deploy:
     - python3 -m pip install --no-cache --upgrade pip setuptools
     - python3 -m pip install kfp
   script:
-    - python3 run_pipeline.py --docker-image "$CI_REGISTRY_IMAGE/pytorch_image_classification"
+    - python3 run_pipeline.py --docker-image "$CI_REGISTRY_IMAGE/pytorch_semantic_segmentation"
   only:
     - master
   tags:
