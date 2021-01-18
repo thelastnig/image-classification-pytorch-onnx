@@ -98,32 +98,32 @@ class DeepV3Plus(nn.Module):
         return out, None
 
 
-def DeepV3PlusSRNX50(num_classes, criterion):
+def DeepV3PlusSRNX50(num_classes, criterion=None):
     return DeepV3Plus(num_classes, trunk='seresnext-50', criterion=criterion)
 
 
-def DeepV3PlusR50(num_classes, criterion):
+def DeepV3PlusR50(num_classes, criterion=None):
     return DeepV3Plus(num_classes, trunk='resnet-50', criterion=criterion)
 
 
-def DeepV3PlusSRNX101(num_classes, criterion):
+def DeepV3PlusSRNX101(num_classes, criterion=None):
     return DeepV3Plus(num_classes, trunk='seresnext-101', criterion=criterion)
 
 
-def DeepV3PlusW38(num_classes, criterion):
+def DeepV3PlusW38(num_classes, criterion=None):
     return DeepV3Plus(num_classes, trunk='wrn38', criterion=criterion)
 
 
-def DeepV3PlusW38I(num_classes, criterion):
+def DeepV3PlusW38I(num_classes, criterion=None):
     return DeepV3Plus(num_classes, trunk='wrn38', criterion=criterion,
                       init_all=True)
 
 
-def DeepV3PlusX71(num_classes, criterion):
+def DeepV3PlusX71(num_classes, criterion=None):
     return DeepV3Plus(num_classes, trunk='xception71', criterion=criterion)
 
 
-def DeepV3PlusEffB4(num_classes, criterion):
+def DeepV3PlusEffB4(num_classes, criterion=None):
     return DeepV3Plus(num_classes, trunk='efficientnet_b4',
                       criterion=criterion)
 
@@ -162,5 +162,5 @@ class DeepV3(nn.Module):
         return out, None
 
 
-def DeepV3R50(num_classes, criterion):
+def DeepV3R50(num_classes, criterion=None):
     return DeepV3(num_classes, trunk='resnet-50', criterion=criterion)
