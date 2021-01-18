@@ -8,7 +8,7 @@ import torch
 from config import cfg
 from .utils import *
 from .deepv3 import *
-from .hrnetv2 import *
+from .ocrnet import *
 
 
 def get_net(args, criterion):
