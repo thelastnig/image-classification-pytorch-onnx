@@ -6,10 +6,11 @@ import mlflow
 import torch
 from torch.utils.data import DataLoader
 
-from src.utils import get_optimizer, AverageMeter, accuracy
+from src.utils import get_optimizer, AverageMeter
+from src.models.metric import calculate_iou
 
 
-class ImageClassificationTrainer(object):
+class SemanticSegmentationTrainer(object):
   def __init__(self,
                train_dataset, val_dataset, test_dataset,
                model, hyper_dict, experiment_name,
@@ -33,7 +34,7 @@ class ImageClassificationTrainer(object):
 
     key_lst = []
     for split in ('train', 'val', 'test'):
-      for metric in ('loss', 'acc', 'time'):
+      for metric in ('loss', 'iou', 'time'):
         key_lst.append(f"{split}_{metric}")
 
     self.avg_meter = {key: AverageMeter() for key in key_lst}
@@ -56,9 +57,9 @@ class ImageClassificationTrainer(object):
       self.model.zero_grad()
       gt = gt.to(self.device)
       pred, loss = self.model(x.to(self.device), gt)
-      acc = accuracy(pred, gt.argmax(dim=1), 1)
+      iou = calculate_iou(pred.argmax(dim=1), gt)
       self.avg_meter['train_loss'].update(loss.item(), x.shape[0])
-      self.avg_meter['train_acc'].update(acc, x.shape[0])
+      self.avg_meter['train_iou'].update(iou, x.shape[0])
       loss.backward()
       self.optimizer.step()
       end_time = time.time()
@@ -72,9 +73,9 @@ class ImageClassificationTrainer(object):
         self.model.zero_grad()
         gt = gt.to(self.device)
         pred, loss = self.model(x.to(self.device), gt)
-        acc = accuracy(pred, gt.argmax(dim=1), 1)
+        iou = calculate_iou(pred.argmax(dim=1), gt)
         self.avg_meter[f'{split_str}_loss'].update(loss.item())
-        self.avg_meter[f'{split_str}_acc'].update(acc)
+        self.avg_meter[f'{split_str}_iou'].update(iou)
         end_time = time.time()
         self.avg_meter[f'{split_str}_time'].update(end_time - start_time)
 
@@ -110,7 +111,7 @@ class ImageClassificationTrainer(object):
       mlflow.set_tag(f"{self.experiment_name}_{key}", self.tag_str[key])
 
     for split in ('train', 'val', 'test'):
-      for metric in ('loss', 'acc'):
+      for metric in ('loss', 'iou'):
         key = f"{split}_{metric}"
         mlflow.log_metric(key=key, value=self.avg_meter[key].avg, step=epoch)
 
@@ -139,7 +140,7 @@ class ImageClassificationTrainer(object):
     self.after_train()
 
 
-class ImageClassificationCVWrapper(object):
+class SemanticSegmentationCVWrapper(object):
   def __init__(self, cv_dataset, test_dataset, build_model,
                hyper_dict, experiment_name, device):
     self.cv_dataset = cv_dataset
@@ -161,7 +162,7 @@ class ImageClassificationCVWrapper(object):
 
   def before_fold(self):
     model = self.build_model()
-    self.trainer = ImageClassificationTrainer(
+    self.trainer = SemanticSegmentationTrainer(
       self.train_dataset, self.val_dataset, self.test_dataset, model, self.hyper_dict,
       f"{self.experiment_name}_{self.fold_idx + 1}/{self.num_folds}", self.device, True)
 

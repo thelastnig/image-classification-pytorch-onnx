@@ -11,7 +11,7 @@ if __name__ == "__main__":
   parser.add_argument('--docker-image', metavar="docker_img_name", type=str)
   args = parser.parse_args()
 
-  pipeline_name = 'trainer_classification'
+  pipeline_name = 'trainer_semantic_segmentation'
   timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
                mlflow_s3_endpoint_url="http://175.197.4.122:9000",
                mlflow_tracking_uri="http://175.197.4.214:5000",
                aws_default_region="SEOUL",
-               model_name="resnet18",
+               model_name="DeepV3PlusW38",
                split_type="T"):
     op = dsl.ContainerOp(
       name=pipeline_name, image=args.docker_image,

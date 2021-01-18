@@ -6,9 +6,10 @@ import mlflow
 import torch
 
 from src.models import *
-from src.pachy_dataset import PachyClassificationDataset
+from src.pachy_dataset import PachySemanticDataset
 from src.split import SplitDataset, CrossValidationDataset
-from src.trainer import ImageClassificationTrainer, ImageClassificationCVWrapper
+from src.trainer import SemanticSegmentationTrainer, SemanticSegmentationCVWrapper
+import config
 
 
 def main(args):
@@ -21,7 +22,7 @@ def main(args):
   else:
     raise ValueError(f"{args.model_name} is not a registered model name")
 
-  dataset = PachyClassificationDataset(f'{args.dataset_name}/master', '/data/images/test/')
+  dataset = PachySemanticDataset(f'{args.dataset_name}/master', '/')
   hyper_dict = {
     'epochs': args.epoch,
     'batch_size': args.batch_size,
@@ -30,6 +31,7 @@ def main(args):
     'learning_rate': args.lr,
     'weight_decay': args.weight_decay,
   }
+  config.assert_and_infer_cfg(train_mode=True)
 
   if args.split_type == "T":
     split_total = args.split_training + args.split_validation + args.split_test
@@ -41,7 +43,7 @@ def main(args):
     test_dataset = SplitDataset(dataset, (val_test_barrier, 1.), args.split_seed)
 
     model = model_cls(num_classes=dataset.num_classes)
-    trainer = ImageClassificationTrainer(
+    trainer = SemanticSegmentationTrainer(
       train_dataset, val_dataset, test_dataset, model,
       hyper_dict, args.experiment_name, device)
     trainer.train()
@@ -52,7 +54,7 @@ def main(args):
     trainval_dataset = SplitDataset(dataset, (0., val_test_barrier), args.split_seed)
     test_dataset = SplitDataset(dataset, (val_test_barrier, 1.), args.split_seed)
     cv_dataset = CrossValidationDataset(trainval_dataset, args.num_cv_folds, args.split_seed)
-    trainer = ImageClassificationCVWrapper(
+    trainer = SemanticSegmentationCVWrapper(
       cv_dataset, test_dataset, lambda: model_cls(num_classes=dataset.num_classes),
       hyper_dict, args.experiment_name, device)
     trainer.train()
@@ -63,11 +65,11 @@ def main(args):
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   # Learning parameters
-  parser.add_argument('--dataset_name', default="cifar10-raw", type=str, help="dataset_name")
+  parser.add_argument('--dataset_name', default="voctrainval", type=str, help="dataset_name")
   parser.add_argument('--batch_size', default=32, type=int, help="batch_size")
   parser.add_argument('--epoch', default=10, type=int, help="epoch")
   parser.add_argument('--lr', default=1e-3, type=float, help="lr")
-  parser.add_argument('--model_name', default="resnet18", type=str, help="model_name")
+  parser.add_argument('--model_name', default="DeepV3PlusW38", type=str, help="model_name")
   parser.add_argument('--momentum', default=0.9, type=float, help="momentum")
   parser.add_argument('--weight_decay', default=5e-4, type=float, help="weight_decay")
   parser.add_argument('--experiment_name', default="any_exp", type=str, help="exp_name")
