@@ -4,7 +4,7 @@ from datetime import datetime
 from kfp import dsl
 from kfp.compiler import compiler
 import kfp.components
-from kubernetes.client.models import V1EnvVar
+from kubernetes.client.models import V1EnvVar, V1Volume
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Create a kubeflow pipeline')
@@ -28,6 +28,8 @@ if __name__ == "__main__":
     op = dsl.ContainerOp(
       name=pipeline_name, image=args.docker_image,
       arguments=["--model_name", model_name, "--split_type", split_type]
+    ).add_pvolumes(
+      {"/dev/shm": V1Volume(name="dshm", empty_dir={"medium": "Memory"})}
     ).add_env_variable(
       V1EnvVar(name="AWS_ACCESS_KEY_ID", value=aws_access_key_id)
     ).add_env_variable(
