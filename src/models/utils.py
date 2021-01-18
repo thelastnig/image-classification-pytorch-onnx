@@ -38,7 +38,7 @@ from src.models.xception import xception71
 from src.models.wider_resnet import wrn38
 from src.models.SEresnext import se_resnext50_32x4d, se_resnext101_32x4d
 from src.models.Resnet import resnet50, resnet101
-from src import models as hrnetv2
+from src.models import hrnetv2
 
 from config import cfg
 
