@@ -135,3 +135,55 @@ class ImageClassificationTrainer(object):
       self.after_epoch(epoch)
 
     self.after_train()
+
+
+class ImageClassificationCVWrapper(object):
+  def __init__(self, cv_dataset, test_dataset, build_model,
+               hyper_dict, experiment_name, device):
+    self.cv_dataset = cv_dataset
+    self.num_folds = len(cv_dataset)
+    self.fold_idx = 0
+    self.train_dataset = self.val_dataset = None
+    self.test_dataset = test_dataset
+    self.build_model = build_model
+    self.trainer = None
+    self.hyper_dict = hyper_dict
+    self.experiment_name = experiment_name
+    self.device = device
+
+    self.best_model = None
+    self.test_loss_at_best_val = -1
+
+  def before_train(self):
+    pass
+
+  def before_fold(self):
+    model = self.build_model()
+    self.trainer = ImageClassificationTrainer(
+      self.train_dataset, self.val_dataset, self.test_dataset, model, self.hyper_dict,
+      f"{self.experiment_name}_{self.fold_idx + 1}/{self.num_folds}", self.device, True)
+
+  def train_fold(self):
+    self.trainer.train()
+
+  def after_fold(self):
+    if self.best_model is None or self.test_loss_at_best_val > self.trainer.test_loss_at_best_val:
+      self.test_loss_at_best_val = self.trainer.test_loss_at_best_val
+      self.best_model = copy.deepcopy(self.trainer.best_model)
+
+  def after_train(self):
+    mlflow.log_artifacts('runs', artifact_path="tensorboard")
+    mlflow.pytorch.log_model(self.best_model, artifact_path="pytorch-model")
+
+  def train(self):
+    self.before_train()
+    for fold_idx, (train_dataset, val_dataset) in enumerate(self.cv_dataset):
+      self.fold_idx = fold_idx
+      self.train_dataset = train_dataset
+      self.val_dataset = val_dataset
+
+      self.before_fold()
+      self.train_fold()
+      self.after_fold()
+
+    self.after_train()

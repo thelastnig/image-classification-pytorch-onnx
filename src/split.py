@@ -62,7 +62,7 @@ class MergedDataset(torch.utils.data.Dataset):
         return self.dataset_lst[dataset_idx][idx - self.sum_lst[dataset_idx]]
 
 
-class CrossValidation(object):
+class CrossValidationDataset(object):
   """
   Dynamically split given Dataset into folds
   and iterate over folds
