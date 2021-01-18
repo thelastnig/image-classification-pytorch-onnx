@@ -477,8 +477,8 @@ class HighResolutionNet(nn.Module):
             raise RuntimeError('No such file {}'.format(pretrained))
 
 
-def HRNetV2():
+def get_seg_model():
     model = HighResolutionNet()
-    model.init_weights()
+    model.init_weights(pretrained=False)
 
     return model
