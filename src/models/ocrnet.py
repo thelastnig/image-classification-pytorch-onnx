@@ -118,25 +118,22 @@ class OCRNet(nn.Module):
     self.backbone, _, _, high_level_ch = get_trunk(trunk)
     self.ocr = OCR_block(high_level_ch)
 
-  def forward(self, inputs):
-    assert 'images' in inputs
-    x = inputs['images']
+  def forward(self, image, gt):
+    x = image
 
     _, _, high_level_features = self.backbone(x)
     cls_out, aux_out, _ = self.ocr(high_level_features)
     aux_out = scale_as(aux_out, x)
     cls_out = scale_as(cls_out, x)
 
-    if self.training:
-      gts = inputs['gts']
-      aux_loss = self.criterion(aux_out, gts,
+    if self.training and gt is not None:
+      aux_loss = self.criterion(aux_out, gt,
                                 do_rmi=cfg.LOSS.OCR_AUX_RMI)
-      main_loss = self.criterion(cls_out, gts)
+      main_loss = self.criterion(cls_out, gt)
       loss = cfg.LOSS.OCR_ALPHA * aux_loss + main_loss
-      return loss
+      return cls_out, loss
     else:
-      output_dict = {'pred': cls_out}
-      return output_dict
+      return cls_out, None
 
 
 class OCRNetASPP(nn.Module):
