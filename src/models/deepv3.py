@@ -39,7 +39,8 @@ from src.models import get_aspp, get_trunk, make_seg_head
 from config import cfg
 
 __all__ = ["DeepV3R50", "DeepV3PlusSRNX50", "DeepV3PlusR50", "DeepV3PlusSRNX101",
-           "DeepV3PlusW38", "DeepV3PlusW38I", "DeepV3PlusX71", "DeepV3PlusEffB4"]
+           "DeepV3PlusW38", "DeepV3PlusW38I", "DeepV3PlusX71", "DeepV3PlusEffB4",
+           "WiderResNet38_DeepV3Plus"]
 
 
 class DeepV3Plus(nn.Module):
@@ -118,6 +119,9 @@ def DeepV3PlusW38I(num_classes, criterion=None):
     return DeepV3Plus(num_classes, trunk='wrn38', criterion=criterion,
                       init_all=True)
 
+def WiderResNet38_DeepV3Plus(num_classes, criterion=None):
+    return DeepV3Plus(num_classes, trunk='wrn38', criterion=criterion,
+                      init_all=True)
 
 def DeepV3PlusX71(num_classes, criterion=None):
     return DeepV3Plus(num_classes, trunk='xception71', criterion=criterion)
@@ -164,3 +168,4 @@ class DeepV3(nn.Module):
 
 def DeepV3R50(num_classes, criterion=None):
     return DeepV3(num_classes, trunk='resnet-50', criterion=criterion)
+

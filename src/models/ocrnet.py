@@ -38,7 +38,7 @@ from .utils import make_attn_head
 from .ocr_utils import SpatialGather_Module, SpatialOCR_Module
 from config import cfg
 
-__all__ = ["HRNetV2", "HRNetV2_Mscale"]
+__all__ = ["HRNetV2", "HRNetV2_OCR", "HRNetV2_Mscale"]
 
 
 def fmt_scale(prefix, scale):
@@ -356,7 +356,14 @@ def HRNetV2(num_classes, criterion=None):
   return OCRNet(num_classes, trunk='hrnetv2', criterion=criterion)
 
 
+def HRNetV2_OCR(num_classes, criterion=None):
+  criterion = (criterion if criterion is not None
+            else CrossEntropyLoss2d(ignore_index=cfg.DATASET.IGNORE_LABEL))
+  return OCRNet(num_classes, trunk='hrnetv2', criterion=criterion)
+
+
 def HRNetV2_Mscale(num_classes, criterion=None):
   criterion = (criterion if criterion is not None
                else CrossEntropyLoss2d(ignore_index=cfg.DATASET.IGNORE_LABEL))
   return MscaleOCR(num_classes, trunk='hrnetv2', criterion=criterion)
+
