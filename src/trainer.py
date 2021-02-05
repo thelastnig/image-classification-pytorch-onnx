@@ -9,6 +9,48 @@ from torch.utils.data import DataLoader
 from src.utils import get_optimizer, AverageMeter
 from src.models.metric import calculate_iou
 
+import signal
+import sys
+
+
+class LockableHandler(object):
+    def __init__(self):
+        self.locked = False
+        self.received_signal = False
+
+        signal.signal(signal.SIGTERM, self.on_sigterm)
+
+    def handle(self):
+        pass
+
+    def lock(self):
+        if self.locked:
+            raise ValueError("lock() called on locked object")
+        self.locked = True
+
+    def unlock(self):
+        if not self.locked:
+            raise ValueError("unlock() called on unlocked object")
+        self.locked = False
+        if self.received_signal:
+            self.handle()
+
+    def on_sigterm(self, signum, frame):
+        self.received_signal = True
+        if not self.locked:
+            self.handle()
+
+
+class LockableModelSaveHandler(LockableHandler):
+    def handle():
+        if os.path.exists('best.h5'):
+            best_model = keras.models.load_model('best.h5')
+            mlflow.keras.log_model(best_model, 'keras-best-model')
+            print("best model saved")
+        else:
+            print("Mo model saved")
+        sys.exit(0)
+
 
 class SemanticSegmentationTrainer(object):
   def __init__(self,
@@ -80,11 +122,13 @@ class SemanticSegmentationTrainer(object):
         self.avg_meter[f'{split_str}_time'].update(end_time - start_time)
 
   def save_checkpoint(self, epoch):
+    self.handler.lock()
     filename = f"checkpoint.{epoch}.pth"
     torch.save({
       "model": self.model.state_dict(),
       "optimizer": self.optimizer.state_dict(),
     }, filename)
+    self.handler.unlock()
     return filename
 
   def before_train(self):
