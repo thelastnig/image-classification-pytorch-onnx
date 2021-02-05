@@ -61,6 +61,8 @@ class SemanticSegmentationTrainer(object):
     self.val_dataset = val_dataset
     self.test_dataset = test_dataset
 
+    self.handler = LockableModelSaveHandler()
+
     self.model = model
     self.best_model = copy.deepcopy(model)
     self.best_val_loss = None
