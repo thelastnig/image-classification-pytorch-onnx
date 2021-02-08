@@ -26,7 +26,7 @@ def main(args):
   hyper_dict = {
     'epochs': args.epoch,
     'batch_size': args.batch_size,
-    'num_workers': 2,
+    'num_workers': 0,
     'optimizer': 'adam',
     'learning_rate': args.lr,
     'weight_decay': args.weight_decay,
