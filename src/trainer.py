@@ -1,6 +1,7 @@
 import os
 import time
 import copy
+from tqdm import tqdm
 
 import mlflow
 import torch
@@ -96,7 +97,7 @@ class SemanticSegmentationTrainer(object):
     self.current_iter = 0
 
   def train_epoch(self):
-    for x, gt in self.train_ldr:
+    for x, gt in tqdm(self.train_ldr, desc="train"):
       start_time = time.time()
       self.model.zero_grad()
       gt = gt.to(self.device)
