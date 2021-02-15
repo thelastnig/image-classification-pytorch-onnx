@@ -28,7 +28,7 @@ def main(args):
     'batch_size': args.batch_size,
     'num_workers': 0,
     'optimizer': 'adam',
-    'learning_rate': args.lr,
+    'learning_rate': args.learning_rate,
     'weight_decay': args.weight_decay,
   }
   config.assert_and_infer_cfg(train_mode=True)
@@ -69,7 +69,7 @@ if __name__ == "__main__":
   parser.add_argument('--dataset_name', default="voctrainval", type=str, help="dataset_name")
   parser.add_argument('--batch_size', default=8, type=int, help="batch_size")
   parser.add_argument('--epoch', default=10, type=int, help="epoch")
-  parser.add_argument('--lr', default=1e-3, type=float, help="lr")
+  parser.add_argument('--learning_rate', default=1e-3, type=float, help="learning_rate")
   parser.add_argument('--model_name', default="DeepV3PlusW38", type=str, help="model_name")
   parser.add_argument('--momentum', default=0.9, type=float, help="momentum")
   parser.add_argument('--weight_decay', default=5e-4, type=float, help="weight_decay")

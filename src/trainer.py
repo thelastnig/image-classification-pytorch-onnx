@@ -161,6 +161,7 @@ class SemanticSegmentationTrainer(object):
       for metric in ('loss', 'iou'):
         key = f"{split}_{metric}"
         mlflow.log_metric(key=key, value=self.avg_meter[key].avg, step=epoch)
+        print(f"{time.time() <{split}-{metric}>={round(self.avg_meter[key].avg, 4)}}")
 
     if self.best_val_loss is None or self.best_val_loss > self.avg_meter['val_loss'].avg:
       self.best_val_loss = self.avg_meter['val_loss'].avg
