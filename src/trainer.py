@@ -171,7 +171,7 @@ class SemanticSegmentationTrainer(object):
   def after_train(self):
     if not self.cross_validation:
       mlflow.log_artifacts('runs', artifact_path="tensorboard")
-      mlflow.pytorch.log_model(self.best_model, artifact_path="pytorch-model")
+      mlflow.pytorch.log_model(self.best_model, artifact_path="model")
     print('Finished Training')
 
   def train(self):
@@ -224,7 +224,7 @@ class SemanticSegmentationCVWrapper(object):
 
   def after_train(self):
     mlflow.log_artifacts('runs', artifact_path="tensorboard")
-    mlflow.pytorch.log_model(self.best_model, artifact_path="pytorch-model")
+    mlflow.pytorch.log_model(self.best_model, artifact_path="model")
 
   def train(self):
     self.before_train()
