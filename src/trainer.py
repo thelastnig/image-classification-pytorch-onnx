@@ -44,7 +44,7 @@ class LockableHandler(object):
 
 
 class LockableModelSaveHandler(LockableHandler):
-    def handle():
+    def handle(self):
         if os.path.exists('best.h5'):
             best_model = keras.models.load_model('best.h5')
             mlflow.keras.log_model(best_model, 'keras-best-model')
