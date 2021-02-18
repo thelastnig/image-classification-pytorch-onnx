@@ -29,7 +29,7 @@ class PachySemanticDataset(Dataset):
 
   def __init__(self, commit, path_prefix="/",
                pachy_host=os.environ['PACHYDERM_HOST_URI'], 
-               pachy_port=os.environ['PACHYDERM_PORT'],
+               pachy_port="30650",
                local_root='/data',
                transform=T.Compose([T.Resize((512, 512)), T.ToTensor()]),
                target_transform=T.Compose([T.Resize((512, 512)), ToLongTensor()])):

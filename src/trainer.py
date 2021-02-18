@@ -6,7 +6,7 @@ from tqdm import tqdm
 import mlflow
 import torch
 from torch.utils.data import DataLoader
-import datetime
+from datetime import datetime, timezone
 
 from src.utils import get_optimizer, AverageMeter
 from src.models.metric import calculate_iou
@@ -159,7 +159,7 @@ class SemanticSegmentationTrainer(object):
       self.tag_str[key] += f"{round(self.avg_meter[key].avg, 3)} "
       mlflow.set_tag(f"{self.experiment_name}_{key}", self.tag_str[key])
 
-    local_time = datetime.now(datetime.timezone.utc).astimezone().isoformat()
+    local_time = datetime.now(timezone.utc).astimezone().isoformat()
     for metric in ('loss', 'iou'):
       for split in ('train', 'val', 'test'):
         key = f"{split}_{metric}"
