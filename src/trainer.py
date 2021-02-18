@@ -78,9 +78,9 @@ class SemanticSegmentationTrainer(object):
     self.device = device
     self.cross_validation = cross_validation
 
-    key_lst = []
+    key_lst = ['time']
     for split in ('train', 'val', 'test'):
-      for metric in ('loss', 'iou', 'time'):
+      for metric in ('loss', 'iou'):
         key_lst.append(f"{split}_{metric}")
 
     self.avg_meter = {key: AverageMeter() for key in key_lst}
