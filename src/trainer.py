@@ -6,6 +6,7 @@ from tqdm import tqdm
 import mlflow
 import torch
 from torch.utils.data import DataLoader
+import datetime
 
 from src.utils import get_optimizer, AverageMeter
 from src.models.metric import calculate_iou
@@ -108,7 +109,7 @@ class SemanticSegmentationTrainer(object):
       loss.backward()
       self.optimizer.step()
       end_time = time.time()
-      self.avg_meter['train_time'].update(end_time - start_time)
+      self.avg_meter['time'].update(end_time - start_time)
       self.current_iter += 1
 
   def test(self, loader, split_str="test"):
@@ -122,7 +123,7 @@ class SemanticSegmentationTrainer(object):
         self.avg_meter[f'{split_str}_loss'].update(loss.item())
         self.avg_meter[f'{split_str}_iou'].update(iou)
         end_time = time.time()
-        self.avg_meter[f'{split_str}_time'].update(end_time - start_time)
+        # self.avg_meter[f'{split_str}_time'].update(end_time - start_time)
 
   def save_checkpoint(self, epoch):
     self.handler.lock()
@@ -157,11 +158,16 @@ class SemanticSegmentationTrainer(object):
       self.tag_str[key] += f"{round(self.avg_meter[key].avg, 3)} "
       mlflow.set_tag(f"{self.experiment_name}_{key}", self.tag_str[key])
 
-    for split in ('train', 'val', 'test'):
-      for metric in ('loss', 'iou'):
+    local_time = datetime.now(datetime.timezone.utc).astimezone().isoformat()
+    for metric in ('loss', 'iou'):
+      for split in ('train', 'val', 'test'):
         key = f"{split}_{metric}"
         mlflow.log_metric(key=key, value=self.avg_meter[key].avg, step=epoch)
-        print(f"{time.time()} {split}-{metric}={round(self.avg_meter[key].avg, 4)}")
+        hpo_metric = 'mean-iou' if metric == 'iou' else metric
+        if split == 'train':
+          print(f"{local_time} {hpo_metric}={round(self.avg_meter[key].avg, 4)}")
+        elif split == 'val':
+          print(f"{local_time} validation-{hpo_metric}={round(self.avg_meter[key].avg, 4)}")
 
     if self.best_val_loss is None or self.best_val_loss > self.avg_meter['val_loss'].avg:
       self.best_val_loss = self.avg_meter['val_loss'].avg
@@ -170,7 +176,6 @@ class SemanticSegmentationTrainer(object):
 
   def after_train(self):
     if not self.cross_validation:
-      mlflow.log_artifacts('runs', artifact_path="tensorboard")
       mlflow.pytorch.log_model(self.best_model, artifact_path="model")
     print('Finished Training')
 
@@ -223,7 +228,6 @@ class SemanticSegmentationCVWrapper(object):
       self.best_model = copy.deepcopy(self.trainer.best_model)
 
   def after_train(self):
-    mlflow.log_artifacts('runs', artifact_path="tensorboard")
     mlflow.pytorch.log_model(self.best_model, artifact_path="model")
 
   def train(self):
