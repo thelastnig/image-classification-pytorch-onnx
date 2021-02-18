@@ -144,6 +144,7 @@ class SemanticSegmentationTrainer(object):
     model_size = round(os.path.getsize(filename) / 1e6)
     mlflow.set_tag("model_size", model_size)
 
+    mlflow.set_tag("experiment_name", f"{self.experiment_name}")
     for hyper_key, hyper_value in self.hyper_dict.items():
       mlflow.log_param(hyper_key, hyper_value)
 
