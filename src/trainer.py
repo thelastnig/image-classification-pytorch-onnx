@@ -126,13 +126,10 @@ class SemanticSegmentationTrainer(object):
         # self.avg_meter[f'{split_str}_time'].update(end_time - start_time)
 
   def save_checkpoint(self, epoch):
-    self.handler.lock()
     filename = f"checkpoint.{epoch}.pth"
     torch.save({
-      "model": self.model.state_dict(),
-      "optimizer": self.optimizer.state_dict(),
+      "model": self.model.state_dict()
     }, filename)
-    self.handler.unlock()
     return filename
 
   def before_train(self):
@@ -176,9 +173,18 @@ class SemanticSegmentationTrainer(object):
       self.test_loss_at_best_val = self.avg_meter['test_loss'].avg
 
   def after_train(self):
+    self.handler.lock()
     if not self.cross_validation:
-      mlflow.pytorch.log_model(self.best_model, artifact_path="model")
+      # mlflow.pytorch.log_model(self.best_model, artifact_path="model")
+      os.makedirs('data', exist_ok=True)
+      try:
+        torch.save({"model": self.best_model}, "data/model.pth")
+      except:
+        torch.save({"weights": self.best_model.state_dict()}, "data/model.pth")
+        mlflow.log_artifact("src/models/", artifact_path="architecture")
+      mlflow.log_artifact("data/", artifact_path="model")
     print('Finished Training')
+    self.handler.unlock()
 
   def train(self):
     self.before_train()
