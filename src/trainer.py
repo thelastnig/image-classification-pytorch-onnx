@@ -54,7 +54,7 @@ class LockableModelSaveHandler(LockableHandler):
         sys.exit(0)
 
 
-class SemanticSegmentationTrainer(object):
+class ImageClassificationTrainer(object):
   def __init__(self,
                train_dataset, val_dataset, test_dataset,
                model, hyper_dict, experiment_name,
@@ -200,7 +200,7 @@ class SemanticSegmentationTrainer(object):
     self.after_train()
 
 
-class SemanticSegmentationCVWrapper(object):
+class ImageClassificationCVWrapper(object):
   def __init__(self, cv_dataset, test_dataset, build_model,
                hyper_dict, experiment_name, device):
     self.cv_dataset = cv_dataset

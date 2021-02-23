@@ -8,7 +8,7 @@ import torch
 from src.models import *
 from src.pachy_dataset import PachySemanticDataset
 from src.split import SplitDataset, CrossValidationDataset
-from src.trainer import SemanticSegmentationTrainer, SemanticSegmentationCVWrapper
+from src.trainer import ImageClassificationTrainer, ImageClassificationCVWrapper
 import config
 
 
@@ -44,7 +44,7 @@ def main(args):
     test_dataset = SplitDataset(dataset, (val_test_barrier, 1.), args.split_seed)
 
     model = model_cls(num_classes=dataset.num_classes)
-    trainer = SemanticSegmentationTrainer(
+    trainer = ImageClassificationTrainer(
       train_dataset, val_dataset, test_dataset, model,
       hyper_dict, args.experiment_name, device)
     trainer.train()
@@ -55,7 +55,7 @@ def main(args):
     trainval_dataset = SplitDataset(dataset, (0., val_test_barrier), args.split_seed)
     test_dataset = SplitDataset(dataset, (val_test_barrier, 1.), args.split_seed)
     cv_dataset = CrossValidationDataset(trainval_dataset, args.num_cv_folds, args.split_seed)
-    trainer = SemanticSegmentationCVWrapper(
+    trainer = ImageClassificationCVWrapper(
       cv_dataset, test_dataset, lambda: model_cls(num_classes=dataset.num_classes),
       hyper_dict, args.experiment_name, device)
     trainer.train()
