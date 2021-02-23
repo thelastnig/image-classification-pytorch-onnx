@@ -8,8 +8,7 @@ import torch
 from torch.utils.data import DataLoader
 from datetime import datetime, timezone
 
-from src.utils import get_optimizer, AverageMeter
-from src.models.metric import accuracy
+from src.utils import get_optimizer, AverageMeter, accuracy
 
 import signal
 import sys
@@ -103,7 +102,7 @@ class ImageClassificationTrainer(object):
       self.model.zero_grad()
       gt = gt.to(self.device)
       pred, loss = self.model(x.to(self.device), gt)
-      acc = accuracy(pred, gt, 1)
+      acc = accuracy(pred, gt.argmax(dim=1), 1)
       self.avg_meter['train_loss'].update(loss.item(), x.shape[0])
       self.avg_meter['train_acc'].update(acc, x.shape[0])
       loss.backward()
@@ -119,11 +118,12 @@ class ImageClassificationTrainer(object):
         self.model.zero_grad()
         gt = gt.to(self.device)
         pred, loss = self.model(x.to(self.device), gt)
-        acc = accuracy(pred, gt, 1)
+        acc = accuracy(pred, gt.argmax(dim=1), 1)
         self.avg_meter[f'{split_str}_loss'].update(loss.item())
         self.avg_meter[f'{split_str}_acc'].update(acc)
         end_time = time.time()
         # self.avg_meter[f'{split_str}_time'].update(end_time - start_time)
+
 
   def save_checkpoint(self, epoch):
     filename = f"checkpoint.{epoch}.pth"
@@ -222,7 +222,7 @@ class ImageClassificationCVWrapper(object):
 
   def before_fold(self):
     model = self.build_model()
-    self.trainer = SemanticSegmentationTrainer(
+    self.trainer = ImageClassificationTrainer(
       self.train_dataset, self.val_dataset, self.test_dataset, model, self.hyper_dict,
       f"{self.experiment_name}_{self.fold_idx + 1}/{self.num_folds}", self.device, True)
 

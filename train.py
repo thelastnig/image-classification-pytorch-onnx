@@ -6,10 +6,17 @@ import mlflow
 import torch
 
 from src.models import *
-from src.pachy_dataset import PachySemanticDataset
+from src.pachy_dataset import PachyClassificationDataset
 from src.split import SplitDataset, CrossValidationDataset
 from src.trainer import ImageClassificationTrainer, ImageClassificationCVWrapper
-import config
+
+
+os.environ["AWS_ACCESS_KEY_ID"] = "smr"
+os.environ["AWS_SECRET_ACCESS_KEY"] = "smr0701!"
+os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://175.197.4.122:9000"
+os.environ["AWS_DEFAULT_REGION"] = "SEOUL"
+os.environ["GIT_PYTHON_REFRESH"] = "quiet"
+os.environ['MLFLOW_TRACKING_URI'] = 'http://175.197.4.214:5000'
 
 
 def main(args):
@@ -22,17 +29,15 @@ def main(args):
   else:
     raise ValueError(f"{args.model_name} is not a registered model name")
 
-  dataset = PachySemanticDataset(f'{args.dataset_name}/master', '/')
+  dataset = PachyClassificationDataset(f'{args.dataset_name}/master')
   hyper_dict = {
     'epochs': args.epoch,
     'batch_size': args.batch_size,
     'num_workers': 0,
     'optimizer': 'adam',
-    'learning_rate': args.learning_rate,
+    'learning_rate': args.lr,
     'weight_decay': args.weight_decay,
   }
-  config.assert_and_infer_cfg(train_mode=True)
-  config.update_dataset_cfg(dataset.num_classes, 255)
 
   if args.split_type == "T":
     split_total = args.split_training + args.split_validation + args.split_test
@@ -66,11 +71,11 @@ def main(args):
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   # Learning parameters
-  parser.add_argument('--dataset_name', default="voctrainval", type=str, help="dataset_name")
-  parser.add_argument('--batch_size', default=8, type=int, help="batch_size")
+  parser.add_argument('--dataset_name', default="flowers17", type=str, help="dataset_name")
+  parser.add_argument('--batch_size', default=32, type=int, help="batch_size")
   parser.add_argument('--epoch', default=10, type=int, help="epoch")
-  parser.add_argument('--learning_rate', default=1e-3, type=float, help="learning_rate")
-  parser.add_argument('--model_name', default="DeepV3PlusW38", type=str, help="model_name")
+  parser.add_argument('--lr', default=1e-3, type=float, help="lr")
+  parser.add_argument('--model_name', default="resnet18", type=str, help="model_name")
   parser.add_argument('--momentum', default=0.9, type=float, help="momentum")
   parser.add_argument('--weight_decay', default=5e-4, type=float, help="weight_decay")
   parser.add_argument('--experiment_name', default="any_exp", type=str, help="exp_name")
