@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from datetime import datetime, timezone
 
 from src.utils import get_optimizer, AverageMeter
-from src.models.metric import calculate_iou
+from src.models.metric import accuracy
 
 import signal
 import sys
@@ -80,7 +80,7 @@ class SemanticSegmentationTrainer(object):
 
     key_lst = ['time']
     for split in ('train', 'val', 'test'):
-      for metric in ('loss', 'iou'):
+      for metric in ('loss', 'acc'):
         key_lst.append(f"{split}_{metric}")
 
     self.avg_meter = {key: AverageMeter() for key in key_lst}
@@ -103,9 +103,9 @@ class SemanticSegmentationTrainer(object):
       self.model.zero_grad()
       gt = gt.to(self.device)
       pred, loss = self.model(x.to(self.device), gt)
-      iou = calculate_iou(pred.argmax(dim=1), gt)
+      acc = accuracy(pred, gt, 1)
       self.avg_meter['train_loss'].update(loss.item(), x.shape[0])
-      self.avg_meter['train_iou'].update(iou, x.shape[0])
+      self.avg_meter['train_acc'].update(acc, x.shape[0])
       loss.backward()
       self.optimizer.step()
       end_time = time.time()
@@ -119,9 +119,9 @@ class SemanticSegmentationTrainer(object):
         self.model.zero_grad()
         gt = gt.to(self.device)
         pred, loss = self.model(x.to(self.device), gt)
-        iou = calculate_iou(pred.argmax(dim=1), gt)
+        acc = accuracy(pred, gt, 1)
         self.avg_meter[f'{split_str}_loss'].update(loss.item())
-        self.avg_meter[f'{split_str}_iou'].update(iou)
+        self.avg_meter[f'{split_str}_acc'].update(acc)
         end_time = time.time()
         # self.avg_meter[f'{split_str}_time'].update(end_time - start_time)
 
@@ -157,11 +157,11 @@ class SemanticSegmentationTrainer(object):
       mlflow.set_tag(f"{self.experiment_name}_{key}", self.tag_str[key])
 
     local_time = datetime.now(timezone.utc).astimezone().isoformat()
-    for metric in ('loss', 'iou'):
+    for metric in ('loss', 'acc'):
       for split in ('train', 'val', 'test'):
         key = f"{split}_{metric}"
         mlflow.log_metric(key=key, value=self.avg_meter[key].avg, step=epoch)
-        hpo_metric = 'mean-iou' if metric == 'iou' else metric
+        hpo_metric = 'accuracy' if metric == 'acc' else metric
         if split == 'train':
           print(f"{local_time} {hpo_metric}={round(self.avg_meter[key].avg, 4)}")
         elif split == 'val':
