@@ -15,42 +15,44 @@ import sys
 
 
 class LockableHandler(object):
-    def __init__(self):
-        self.locked = False
-        self.received_signal = False
+  def __init__(self, trainer):
+    self.locked = False
+    self.received_signal = False
+    self.trainer = trainer
 
-        signal.signal(signal.SIGTERM, self.on_sigterm)
+    signal.signal(signal.SIGTERM, self.on_sigterm)
 
-    def handle(self):
-        pass
+  def handle(self):
+    pass
 
-    def lock(self):
-        if self.locked:
-            raise ValueError("lock() called on locked object")
-        self.locked = True
+  def lock(self):
+    if self.locked:
+        raise ValueError("lock() called on locked object")
+    self.locked = True
 
-    def unlock(self):
-        if not self.locked:
-            raise ValueError("unlock() called on unlocked object")
-        self.locked = False
-        if self.received_signal:
-            self.handle()
+  def unlock(self):
+    if not self.locked:
+        raise ValueError("unlock() called on unlocked object")
+    self.locked = False
+    if self.received_signal:
+        self.handle()
 
-    def on_sigterm(self, signum, frame):
-        self.received_signal = True
-        if not self.locked:
-            self.handle()
+  def on_sigterm(self, signum, frame):
+    self.received_signal = True
+    if not self.locked:
+        self.handle()
 
 
 class LockableModelSaveHandler(LockableHandler):
-    def handle(self):
-        if os.path.exists('best.h5'):
-            best_model = keras.models.load_model('best.h5')
-            mlflow.keras.log_model(best_model, 'keras-best-model')
-            print("best model saved")
-        else:
-            print("Mo model saved")
-        sys.exit(0)
+  def handle(self):
+    os.makedirs('data', exist_ok=True)
+    try:
+      torch.save({"model": self.trainer.best_model}, "data/model.pth")
+    except:
+      torch.save({"weights": self.trainer.best_model.state_dict()}, "data/model.pth")
+      mlflow.log_artifact("src/models/", artifact_path="architecture")
+    mlflow.log_artifact("data/", artifact_path="model")
+    sys.exit(0)
 
 
 class ImageClassificationTrainer(object):
@@ -62,7 +64,7 @@ class ImageClassificationTrainer(object):
     self.val_dataset = val_dataset
     self.test_dataset = test_dataset
 
-    self.handler = LockableModelSaveHandler()
+    self.handler = LockableModelSaveHandler(self)
 
     self.model = model
     self.best_model = copy.deepcopy(model)

@@ -11,14 +11,6 @@ from src.split import SplitDataset, CrossValidationDataset
 from src.trainer import ImageClassificationTrainer, ImageClassificationCVWrapper
 
 
-os.environ["AWS_ACCESS_KEY_ID"] = "smr"
-os.environ["AWS_SECRET_ACCESS_KEY"] = "smr0701!"
-os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://175.197.4.122:9000"
-os.environ["AWS_DEFAULT_REGION"] = "SEOUL"
-os.environ["GIT_PYTHON_REFRESH"] = "quiet"
-os.environ['MLFLOW_TRACKING_URI'] = 'http://175.197.4.214:5000'
-
-
 def main(args):
   os.environ["GIT_PYTHON_REFRESH"] = "quiet"
   device = 'cuda' if torch.cuda.is_available() else 'cpu'
