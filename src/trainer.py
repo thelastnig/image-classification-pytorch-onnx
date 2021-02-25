@@ -167,7 +167,7 @@ class ImageClassificationTrainer(object):
         if split == 'train':
           print(f"{local_time} {hpo_metric}={round(self.avg_meter[key].avg, 4)}")
         elif split == 'val':
-          print(f"{local_time} validation-{hpo_metric}={round(self.avg_meter[key].avg, 4)}")
+          print(f"{local_time} validation_{hpo_metric}={round(self.avg_meter[key].avg, 4)}")
 
     if self.best_val_loss is None or self.best_val_loss > self.avg_meter['val_loss'].avg:
       self.best_val_loss = self.avg_meter['val_loss'].avg
