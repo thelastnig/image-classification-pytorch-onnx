@@ -183,7 +183,7 @@ class ImageClassificationTrainer(object):
         torch.save({"model": self.best_model}, "data/model.pth")
       except:
         torch.save({"weights": self.best_model.state_dict()}, "data/model.pth")
-        mlflow.log_artifact("src/models/", artifact_path="architecture")
+      mlflow.log_artifact("src/models/", artifact_path="architecture")
       mlflow.log_artifact("data/", artifact_path="model")
     print('Finished Training')
     self.handler.unlock()
