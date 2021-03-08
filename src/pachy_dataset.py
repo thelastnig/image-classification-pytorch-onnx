@@ -42,7 +42,8 @@ class PachyClassificationDataset(Dataset):
 
     with open(os.path.join(self.local_root, "meta.json")) as meta_f:
       meta = json.load(meta_f)
-    self.class_names = meta["class_names"]
+    self.meta = meta
+    self.class_names = self.meta["class_names"]
     self.num_classes = len(self.class_names)
     self.transform = transform
 
@@ -77,11 +78,11 @@ class PachyClassificationDataset(Dataset):
     if isinstance(idx, list):
       return [self[i] for i in idx]
 
-    with open(join_pachy_path(self.local_root, self.anno_path_lst[idx]["path"])) as anno_f:
-      anno = json.load(anno_f)
+    with open(join_pachy_path(self.local_root, self.anno_path_lst[idx]["path"]), 'r') as anno_f:
+      anno = json.loads(json.load(anno_f))
     target = [0] * self.num_classes
-    for category_id in anno["instances"]["category_id"]:
-      target[int(category_id)] = 1
+    for ist in anno["instances"]:
+      target[int(ist['category_id'])] = 1
 
     return (
       self.transform(Image.open(os.path.join(self.local_root, "images",
