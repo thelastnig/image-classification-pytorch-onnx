@@ -91,8 +91,9 @@ class PachyClassificationDataset(Dataset):
     for ist in anno["instances"]:
       target[int(ist['category_id'])] = 1
 
+    img = Image.open(os.path.join(self.local_root, "images", anno["image"]["file_name"])).convert('RGB')
+
     return (
-      self.transform(Image.open(os.path.join(self.local_root, "images",
-                                             anno["image"]["file_name"]))),
+      self.transform(img),
       torch.tensor(target, dtype=torch.float32)
     )
