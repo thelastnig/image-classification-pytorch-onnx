@@ -20,9 +20,12 @@ class PachyClassificationDataset(Dataset):
   def __init__(self, commit, path_prefix="/",
                pachy_host=os.environ['PACHYDERM_HOST_URI'], 
                pachy_port="30650",
-               local_root='/data', transform=T.Compose([
-            T.Resize((256, 256)), T.ToTensor()
-          ])):
+               local_root='/data', 
+               transform=T.Compose([T.Resize((256, 256)), 
+                                    T.ToTensor(),
+                                    T.Normalize(mean=[0.485, 0.456, 0.406],
+                                                std=[0.229, 0.224, 0.225])])
+                ):
     self.commit = commit
     self.path_prefix = path_prefix
     self.local_root = local_root
@@ -79,7 +82,11 @@ class PachyClassificationDataset(Dataset):
       return [self[i] for i in idx]
 
     with open(join_pachy_path(self.local_root, self.anno_path_lst[idx]["path"]), 'r') as anno_f:
-      anno = json.loads(json.load(anno_f))
+      ann_json = json.load(anno_f)
+      try:
+        anno = json.loads(ann_json)
+      except:
+        anno = ann_json
     target = [0] * self.num_classes
     for ist in anno["instances"]:
       target[int(ist['category_id'])] = 1
