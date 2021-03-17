@@ -1,1 +1,1 @@
-# Trainer for AIP - Segmentation
+# Trainer for AIP - Image Classification
