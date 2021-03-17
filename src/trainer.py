@@ -47,10 +47,10 @@ class LockableModelSaveHandler(LockableHandler):
   def handle(self):
     os.makedirs('data', exist_ok=True)
     try:
-      torch.save({"model": self.trainer.best_model}, "data/model.pth")
+      torch.save({"model": self.best_model}, "data/model.pth")
     except:
-      torch.save({"weights": self.trainer.best_model.state_dict()}, "data/model.pth")
-      mlflow.log_artifact("src/models/", artifact_path="architecture")
+      torch.save({"weights": self.best_model.state_dict()}, "data/model.pth")
+    mlflow.log_artifact("src/models/", artifact_path="architecture")
     mlflow.log_artifact("data/", artifact_path="model")
     sys.exit(0)
 
