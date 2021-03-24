@@ -18,7 +18,7 @@ class PachyClassificationDataset(Dataset):
   """
 
   def __init__(self, commit, path_prefix="/",
-               pachy_host=os.environ['PACHYDERM_HOST_URI'], 
+               pachy_host=os.environ['PACHYDERM_HOST_URI'],
                pachy_port="30650",
                local_root='/data', 
                transform=T.Compose([T.Resize((256, 256)), 
