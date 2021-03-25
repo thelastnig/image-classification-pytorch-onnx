@@ -4,46 +4,56 @@ from src.models import *
 from src.pachy_meta_dataset import PachyClassificationMetaDataset
 from minio_manager import MinioManager
 from mlflow_manager import MlflowManager
+from db_manager import DBManager
 import torch
+import sys
+
+db_manager = DBManager()
+mlflow_manager = MlflowManager()
 
 
 def main(args):
-    dataset = PachyClassificationMetaDataset(f'{args.dataset_name}/master', '/')
-    model_cls = eval(args.algorithm_name)
-    torch_model = model_cls(num_classes=dataset.num_classes)
+    try:
+        dataset = PachyClassificationMetaDataset(f'{args.dataset_name}/master', '/')
+        model_cls = eval(args.algorithm_name)
+        torch_model = model_cls(num_classes=dataset.num_classes)
 
-    model_url = 'model.pth'
-    onnx_model_url = "model.onnx"
-    batch_size = 1
+        model_url = 'model.pth'
+        onnx_model_url = "model.onnx"
+        batch_size = 1
 
-    minio_manager = MinioManager(args.run_uuid)
-    minio_manager.load_model_weights(model_url)
+        minio_manager = MinioManager(args.run_uuid)
+        minio_manager.load_model_weights(model_url)
 
-    # ONNX 변환 부분 시작 -------------------------------------------------
-    map_location = lambda storage, loc: storage
-    if torch.cuda.is_available():
-        map_location = None
-    torch_model.load_state_dict(torch.load(model_url, map_location=map_location), strict=False)
+        # ONNX 변환 부분 시작 -------------------------------------------------
+        map_location = lambda storage, loc: storage
+        if torch.cuda.is_available():
+            map_location = None
+        torch_model.load_state_dict(torch.load(model_url, map_location=map_location), strict=False)
 
-    torch_model.eval()
+        torch_model.eval()
 
-    x = torch.randn(batch_size, args.image_depth, args.image_height, args.image_width, requires_grad=True)
+        x = torch.randn(batch_size, args.image_depth, args.image_height, args.image_width, requires_grad=True)
 
-    torch.onnx.export(torch_model,
-                      x,
-                      onnx_model_url,
-                      export_params=True,
-                      opset_version=11,
-                      do_constant_folding=True,
-                      input_names=['input'],
-                      output_names=['output'],
-                      dynamic_axes={'input': {0: 'batch_size'},
-                                    'output': {0: 'batch_size'}}
-                      )
-    # ONNX 변환 부분 끝 -------------------------------------------------
+        torch.onnx.export(torch_model,
+                          x,
+                          onnx_model_url,
+                          export_params=True,
+                          opset_version=11,
+                          do_constant_folding=True,
+                          input_names=['input'],
+                          output_names=['output'],
+                          dynamic_axes={'input': {0: 'batch_size'},
+                                        'output': {0: 'batch_size'}}
+                          )
+        # ONNX 변환 부분 끝 -------------------------------------------------
+    except:
+        log = "포맷 변환 시 문제가 발생하였습니다."
+        db_manager.set_fail_alarm(args.user_id, log, args.project_id)
+        sys.exit()
 
-    mlflow_manager = MlflowManager()
     mlflow_manager.registered_model_version(onnx_model_url, args.model_name)
+    db_manager.set_model_version(args.model_name, args.model_version, args.user_id)
 
 
 if __name__ == "__main__":
@@ -54,6 +64,9 @@ if __name__ == "__main__":
     parser.add_argument('--image_height', default=256, type=int, help="image_height")
     parser.add_argument('--image_width', default=256, type=int, help="image_width")
     parser.add_argument('--model_name', type=str, help="model_name")
+    parser.add_argument('--model_version', type=str, help="model_version")
     parser.add_argument('--run_uuid', type=str, help="run_uuid")
+    parser.add_argument('--user_id', type=str, help="user_id")
+    parser.add_argument('--project_id', type=str, help="project_id")
     args = parser.parse_args()
     main(args)
