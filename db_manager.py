@@ -113,7 +113,7 @@ class DBManager:
                 sql = f"""
                     INSERT INTO {self.SM_AIP_DB_NAME}.TB_ERROR_LOG
                     (error_id, project_id, log_detail, create_user, create_date)
-                    VALUES (%s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s)
                 """
                 cursor.execute(sql, (ERROR_ID, project_id, log, user_id, datetime.datetime.now()))
 
