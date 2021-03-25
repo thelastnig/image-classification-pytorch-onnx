@@ -14,18 +14,25 @@ mlflow_manager = MlflowManager()
 
 def main(args):
     try:
+        print("pachyderm 시작")
         dataset = PachyClassificationMetaDataset(f'{args.dataset_name}/master', '/')
+        print("pachyderm 끝")
+        print("model load 시작")
         model_cls = eval(args.algorithm_name)
         torch_model = model_cls(num_classes=dataset.num_classes)
+        print("model load 끝")
 
         model_url = 'model.pth'
         onnx_model_url = "model.onnx"
         batch_size = 1
 
+        print("minio start")
         minio_manager = MinioManager(args.run_uuid)
         minio_manager.load_model_weights(model_url)
+        print("minio done!")
 
         # ONNX 변환 부분 시작 -------------------------------------------------
+        print("onnx start")
         map_location = lambda storage, loc: storage
         if torch.cuda.is_available():
             map_location = None
@@ -46,6 +53,8 @@ def main(args):
                           dynamic_axes={'input': {0: 'batch_size'},
                                         'output': {0: 'batch_size'}}
                           )
+
+        print("onnx done!")
         # ONNX 변환 부분 끝 -------------------------------------------------
     except:
         log = "포맷 변환 시 문제가 발생하였습니다."
