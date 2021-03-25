@@ -14,25 +14,25 @@ mlflow_manager = MlflowManager()
 
 def main(args):
     try:
-        print("pachyderm 시작")
+        print("---------- data load from pachyderm ----------")
         dataset = PachyClassificationMetaDataset(f'{args.dataset_name}/master', '/')
-        print("pachyderm 끝")
-        print("model load 시작")
+        print("---------- data load done ----------")
+        print("---------- model load ----------")
         model_cls = eval(args.algorithm_name)
         torch_model = model_cls(num_classes=dataset.num_classes)
-        print("model load 끝")
+        print("---------- model done ----------")
 
         model_url = 'model.pth'
         onnx_model_url = "model.onnx"
         batch_size = 1
 
-        print("minio start")
+        print("---------- weight load ----------")
         minio_manager = MinioManager(args.run_uuid)
         minio_manager.load_model_weights(model_url)
-        print("minio done!")
+        print("---------- weight load done ----------")
 
         # ONNX 변환 부분 시작 -------------------------------------------------
-        print("onnx start")
+        print("---------- onnx conversion ----------")
         map_location = lambda storage, loc: storage
         if torch.cuda.is_available():
             map_location = None
@@ -54,10 +54,12 @@ def main(args):
                                         'output': {0: 'batch_size'}}
                           )
 
-        print("onnx done!")
+
+        print("---------- onnx conversion done ----------")
         # ONNX 변환 부분 끝 -------------------------------------------------
-    except:
-        log = "포맷 변환 시 문제가 발생하였습니다."
+    except Exception as e:
+        print(str(e))
+        log = str(e)
         db_manager.set_fail_alarm(args.user_id, log, args.project_id)
         sys.exit()
 
