@@ -42,7 +42,7 @@ if __name__ == "__main__":
                project_id=52
                ):
     op = dsl.ContainerOp(
-      name=pipeline_name, image="thelastnig/pt-image-classification-onnx:3.0",
+      name=pipeline_name, image="thelastnig/pt-image-classification-onnx:4.0",
       arguments=["--model_name", model_name,
                  "--model_version", model_version,
                  "--dataset_name", dataset_name,
